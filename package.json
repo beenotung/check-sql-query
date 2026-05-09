@@ -2,9 +2,18 @@
   "name": "check-sql-query",
   "version": "0.1.0",
   "type": "commonjs",
-  "description": "",
-  "keywords": [],
-  "author": "",
+  "description": "Detects SQL operation types and whether a query is readonly, and validates parameter binding.",
+  "keywords": [
+    "sql",
+    "query",
+    "validator",
+    "readonly",
+    "parameter",
+    "binding",
+    "postgresql",
+    "mysql",
+    "sqlite"
+  ],
   "license": "ISC",
   "repository": {
     "type": "git",
