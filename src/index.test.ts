@@ -193,4 +193,112 @@ describe('checkSqlQuery', () => {
       test('backticks', '`%\\`update%`')
     })
   })
+  describe('missing parameter', () => {
+    function testArrayParameters(name: string, sql: string) {
+      describe(`${name} array parameters`, () => {
+        it('should pass when parameters are enough', () => {
+          let result = checkSqlQuery(sql, ['alice', 'admin'])
+          expect(result).to.deep.equal({
+            readonly: true,
+            types: ['select'],
+          })
+        })
+        it('should fail when missing parameters entirely', () => {
+          let result = checkSqlQuery(sql)
+          expect(result).to.deep.equal({
+            readonly: true,
+            types: ['select'],
+            error: 'missing array parameters',
+          })
+        })
+        it('should fail when parameters are not enough', () => {
+          let result = checkSqlQuery(sql, ['alice'])
+          expect(result).to.deep.equal({
+            readonly: true,
+            types: ['select'],
+            error: 'not enough parameter in array, expected 2, got 1',
+          })
+        })
+        it('should fail when parameters are too many', () => {
+          let result = checkSqlQuery(sql, ['alice', 'admin', 'admin'])
+          expect(result).to.deep.equal({
+            readonly: true,
+            types: ['select'],
+            error: 'too many parameter in array, expected 2, got 3',
+          })
+        })
+      })
+    }
+    testArrayParameters(
+      '"$1" style',
+      'select * from users where username = $1 and role = $2',
+    )
+    testArrayParameters(
+      '"?" style',
+      'select * from users where username = ? and role = ?',
+    )
+
+    function testObjectParameters(symbol: string) {
+      describe(`"${symbol}key" style object parameters`, () => {
+        let sql = `select * from users where username = ${symbol}username and role = ${symbol}role`
+        it('should pass when parameters are enough', () => {
+          let result = checkSqlQuery(sql, { username: 'alice', role: 'admin' })
+          expect(result).to.deep.equal({
+            readonly: true,
+            types: ['select'],
+          })
+        })
+        it('should fail when missing parameters entirely', () => {
+          let result = checkSqlQuery(sql)
+          expect(result).to.deep.equal({
+            readonly: true,
+            types: ['select'],
+            error: 'missing object parameters',
+          })
+        })
+        it('should fail when missing some parameters', () => {
+          let result = checkSqlQuery(sql, { username: 'alice' })
+          expect(result).to.deep.equal({
+            readonly: true,
+            types: ['select'],
+            error: 'missing parameter in object: role',
+          })
+
+          result = checkSqlQuery(sql, {})
+          expect(result).to.deep.equal({
+            readonly: true,
+            types: ['select'],
+            error: 'missing parameter in object: username, role',
+          })
+        })
+        it('should ignore extra parameters', () => {
+          let result = checkSqlQuery(sql, {
+            username: 'alice',
+            role: 'admin',
+            role2: 'admin',
+          })
+          expect(result).to.deep.equal({
+            readonly: true,
+            types: ['select'],
+          })
+        })
+      })
+    }
+    testObjectParameters('@')
+    testObjectParameters(':')
+    testObjectParameters('$')
+  })
+  describe('mixed parameters', () => {
+    it('should fail when mixed "$1" and "?" style parameters', () => {
+      let result = checkSqlQuery(
+        'select * from users where username = $1 and role = ?',
+        ['alice'],
+      )
+      expect(result).to.deep.equal({
+        readonly: true,
+        types: ['select'],
+        error: 'mixed "$1" and "?" style parameters',
+      })
+    })
+  })
 })
