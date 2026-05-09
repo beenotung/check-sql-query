@@ -1,5 +1,5 @@
 {
-  "name": "safe-sql-query",
+  "name": "check-sql-query",
   "version": "0.0.0",
   "type": "commonjs",
   "description": "",
@@ -8,11 +8,11 @@
   "license": "ISC",
   "repository": {
     "type": "git",
-    "url": "git+https://github.com/beenotung/safe-sql-query.git"
+    "url": "git+https://github.com/beenotung/check-sql-query.git"
   },
-  "homepage": "https://github.com/beenotung/safe-sql-query#readme",
+  "homepage": "https://github.com/beenotung/check-sql-query#readme",
   "bugs": {
-    "url": "https://github.com/beenotung/safe-sql-query/issues"
+    "url": "https://github.com/beenotung/check-sql-query/issues"
   },
   "main": "dist/index.js",
   "types": "dist/index.d.ts",
